@@ -89,7 +89,7 @@ Build & Test  ──┬──  Hadolint (lint Dockerfile)
 rate(http_requests_total[1m])
 ```
 
-![Dashboard Requêtes par seconde](docs/dashboard-rps.png)
+![Dashboard Requêtes par seconde](docs/Taux%20de%20requ%C3%AAtes%20par%20seconde.png)
 
 ---
 
@@ -99,7 +99,7 @@ rate(http_requests_total[1m])
 sum(rate(http_requests_total{status=~"5[0-9][0-9]"}[1m])) / sum(rate(http_requests_total[1m])) * 100
 ```
 
-![Dashboard Taux d'erreur](docs/dashboard-errors.png)
+![Dashboard Taux d'erreur](docs/Taux%20d'erreur.png)
 
 ---
 
@@ -109,21 +109,7 @@ sum(rate(http_requests_total{status=~"5[0-9][0-9]"}[1m])) / sum(rate(http_reques
 histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket[1m])) by (le)) * 1000
 ```
 
-![Dashboard Latence p95](docs/dashboard-latency.png)
-
----
-
-### Dashboard complet
-
-![Dashboard complet](docs/dashboard-full.png)
-
----
-
-### Dashboard Node Exporter (métriques système — bonus)
-
-Importé depuis grafana.com avec l'ID `1860`.
-
-![Dashboard Node Exporter](docs/dashboard-node-exporter.png)
+![Dashboard Latence p95](docs/LatenceP95.png)
 
 ---
 
@@ -136,12 +122,10 @@ devsecops-monitoring/
 │       └── devsecops.yml       ← Pipeline GitHub Actions (5 jobs)
 ├── prometheus/
 │   └── prometheus.yml          ← Configuration du scraping Prometheus
-├── docs/                       ← Screenshots des dashboards Grafana (à remplir)
-│   ├── dashboard-rps.png
-│   ├── dashboard-errors.png
-│   ├── dashboard-latency.png
-│   ├── dashboard-full.png
-│   └── dashboard-node-exporter.png
+├── docs/                       ← Screenshots des dashboards Grafana
+│   ├── Taux de requêtes par seconde.png
+│   ├── Taux d'erreur.png
+│   └── LatenceP95.png
 ├── app.js                      ← Application Node.js + métriques prom-client
 ├── package.json
 ├── Dockerfile

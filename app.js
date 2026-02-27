@@ -78,6 +78,13 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok' });
 });
 
+// ─── Route /error ──────────────────────────────────────────────────────────
+// On expose une route qui retourne toujours une erreur 500.
+// On l'utilise uniquement pour tester le panel "Taux d'erreur" dans Grafana.
+app.get('/error', (req, res) => {
+  res.status(500).json({ error: 'Erreur simulée pour les tests' });
+});
+
 // ─── Route /metrics ────────────────────────────────────────────────────────
 // Prometheus va interroger cette URL toutes les 15 secondes pour collecter les métriques.
 // On retourne toutes les métriques enregistrées dans le registre, au format texte Prometheus.
