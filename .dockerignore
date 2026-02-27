@@ -1,0 +1,21 @@
+# On liste ici les fichiers et dossiers à NE PAS copier dans l'image Docker.
+# Le principe est le même que .gitignore mais pour Docker.
+
+# On exclut node_modules : ils seront réinstallés proprement dans l'image via "npm ci".
+# Les inclure alourdirait inutilement l'image et risquerait de mélanger des binaires
+# compilés pour macOS/Windows avec l'environnement Linux du conteneur.
+node_modules
+
+# On exclut le fichier .env qui contient les variables d'environnement sensibles
+# (mots de passe, clés API, etc.). On ne veut JAMAIS les mettre dans une image Docker.
+.env
+
+# On exclut les fichiers de logs (inutiles dans l'image).
+*.log
+
+# On exclut les fichiers Git (dossier .git et .gitignore).
+.git
+.gitignore
+
+# On exclut ce fichier lui-même.
+.dockerignore

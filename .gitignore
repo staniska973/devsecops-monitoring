@@ -1,0 +1,17 @@
+# On liste les fichiers et dossiers à ne PAS versionner avec Git.
+
+# On exclut node_modules : ce dossier peut contenir des centaines de milliers de fichiers.
+# Ils se réinstallent facilement avec "npm install", il n'y a aucune raison de les versionner.
+node_modules/
+
+# On exclut le fichier .env qui contient les secrets (mots de passe, clés API...).
+# On ne met JAMAIS de secrets dans Git !
+.env
+
+# On exclut les fichiers de logs générés par l'application.
+*.log
+npm-debug.log*
+
+# On exclut les fichiers système macOS et Windows (inutiles pour le projet).
+.DS_Store
+Thumbs.db

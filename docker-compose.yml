@@ -1,0 +1,83 @@
+# ─── Réseaux ──────────────────────────────────────────────────────────────────
+# On déclare un réseau Docker commun à tous nos services.
+# Grâce à ce réseau, les conteneurs peuvent se parler par leur nom de service
+# (ex : "prometheus" peut contacter "app" via http://app:3000).
+networks:
+  monitoring:
+
+# ─── Volumes persistants ──────────────────────────────────────────────────────
+# Par défaut, quand on supprime un conteneur, toutes ses données disparaissent.
+# On crée des volumes nommés pour persister les données importantes même après
+# un "docker compose down".
+volumes:
+  prometheus_data:   # On stocke ici les métriques collectées par Prometheus
+  grafana_data:      # On stocke ici les dashboards et configurations Grafana
+
+# ─── Services ─────────────────────────────────────────────────────────────────
+services:
+
+  # ── Service 1 : notre application Node.js ────────────────────────────────────
+  app:
+    # On construit l'image à partir du Dockerfile situé dans le répertoire courant (.)
+    build: .
+    ports:
+      # On expose le port 3000 du conteneur sur le port 3000 de la machine hôte.
+      # Format : "port_hote:port_conteneur"
+      - "3000:3000"
+    networks: [monitoring]
+    # On redémarre automatiquement le conteneur s'il plante,
+    # sauf si on l'a arrêté manuellement.
+    restart: unless-stopped
+
+  # ── Service 2 : Prometheus ────────────────────────────────────────────────────
+  # Prometheus est le cerveau du monitoring : il collecte et stocke les métriques.
+  prometheus:
+    image: prom/prometheus:v2.48.0
+    volumes:
+      # On monte notre fichier de configuration Prometheus dans le conteneur.
+      # ":ro" = read-only, le conteneur ne peut pas modifier ce fichier.
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      # On monte le volume persistant pour conserver les données de métriques.
+      - prometheus_data:/prometheus
+    command:
+      # On passe les arguments de démarrage à Prometheus.
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      # On active l'API de rechargement à chaud (pratique pour mettre à jour
+      # la config sans redémarrer le conteneur).
+      - '--web.enable-lifecycle'
+    ports:
+      - "9090:9090"
+    networks: [monitoring]
+    restart: unless-stopped
+
+  # ── Service 3 : Grafana ───────────────────────────────────────────────────────
+  # Grafana est l'outil de visualisation : il lit les données de Prometheus
+  # et les affiche sous forme de beaux dashboards.
+  grafana:
+    image: grafana/grafana:10.2.0
+    environment:
+      # On définit les identifiants de l'admin via des variables d'environnement.
+      # En production, on utiliserait des secrets Docker ou un vault.
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin123
+    volumes:
+      # On persiste les dashboards et la configuration créés dans Grafana.
+      - grafana_data:/var/lib/grafana
+    ports:
+      # Grafana écoute en interne sur le port 3000, mais notre app utilise déjà
+      # ce port sur l'hôte. On expose donc Grafana sur le port 3001.
+      - "3001:3000"
+    networks: [monitoring]
+    # On s'assure que Grafana ne démarre qu'après Prometheus.
+    depends_on: [prometheus]
+    restart: unless-stopped
+
+  # ── Service 4 : Node Exporter ─────────────────────────────────────────────────
+  # Node Exporter est un agent léger qui lit les métriques système (CPU, RAM,
+  # disque, réseau...) et les expose au format Prometheus sur le port 9100.
+  node-exporter:
+    image: prom/node-exporter:v1.7.0
+    ports:
+      - "9100:9100"
+    networks: [monitoring]
+    restart: unless-stopped

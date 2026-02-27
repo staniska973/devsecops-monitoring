@@ -1,0 +1,17 @@
+{
+  "name": "nodeapp-devsecops",
+  "version": "1.0.0",
+  "description": "Application Node.js avec monitoring Prometheus / Grafana et pipeline DevSecOps",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "node --watch app.js"
+  },
+  "keywords": ["devsecops", "prometheus", "grafana", "monitoring"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "prom-client": "^15.1.0"
+  }
+}

@@ -1,0 +1,27 @@
+# ─── Configuration globale ────────────────────────────────────────────────────
+global:
+  # On définit l'intervalle de scrape (collecte) : toutes les 15 secondes,
+  # Prometheus va interroger chaque cible pour récupérer ses métriques.
+  scrape_interval: 15s
+
+  # On définit le délai d'évaluation des règles d'alerte (non utilisé ici,
+  # mais bonne pratique de le déclarer).
+  evaluation_interval: 15s
+
+# ─── Cibles à scraper ─────────────────────────────────────────────────────────
+scrape_configs:
+
+  # ── Cible 1 : notre application Node.js ─────────────────────────────────────
+  # On indique à Prometheus d'aller chercher les métriques sur app:3000/metrics.
+  # "app" est le nom du service dans docker-compose.yml.
+  # Docker résout automatiquement ce nom en adresse IP dans le réseau interne.
+  - job_name: 'nodeapp'
+    static_configs:
+      - targets: ['app:3000']
+
+  # ── Cible 2 : Node Exporter ──────────────────────────────────────────────────
+  # Node Exporter expose les métriques système de la machine hôte :
+  # CPU, RAM, disque, réseau, etc. → port 9100.
+  - job_name: 'node-exporter'
+    static_configs:
+      - targets: ['node-exporter:9100']
